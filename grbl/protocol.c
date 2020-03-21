@@ -157,6 +157,7 @@ void protocol_main_loop()
     protocol_auto_cycle_start();
 
     protocol_execute_realtime();  // Runtime command check point.
+	display_process();
     if (sys.abort) { return; } // Bail to main() program loop to reset system.
   }
 

@@ -46,12 +46,22 @@ uint8_t system_control_get_state()
   #endif
   if (pin) {
     #ifdef ENABLE_SAFETY_DOOR_INPUT_PIN
-      if (bit_istrue(pin,(1<<CONTROL_SAFETY_DOOR_BIT))) { control_state |= CONTROL_PIN_INDEX_SAFETY_DOOR; }
+		#ifdef CONTROL_SAFETY_DOOR_BIT	
+			if (bit_istrue(pin,(1<<CONTROL_SAFETY_DOOR_BIT))) { control_state |= CONTROL_PIN_INDEX_SAFETY_DOOR; }
+		#endif //#ifdef CONTROL_SAFETY_DOOR_BIT			  
     #else
-      if (bit_istrue(pin,(1<<CONTROL_FEED_HOLD_BIT))) { control_state |= CONTROL_PIN_INDEX_FEED_HOLD; }
+	    #ifdef CONTROL_FEED_HOLD_BIT
+			if (bit_istrue(pin,(1<<CONTROL_FEED_HOLD_BIT))) { control_state |= CONTROL_PIN_INDEX_FEED_HOLD; }
+	    #endif //#ifdef CONTROL_FEED_HOLD_BIT				
     #endif
+	
+#ifdef CONTROL_RESET_BIT	
     if (bit_istrue(pin,(1<<CONTROL_RESET_BIT))) { control_state |= CONTROL_PIN_INDEX_RESET; }
+#endif //#ifdef CONTROL_RESET_BIT			
+		
+#ifdef CONTROL_CYCLE_START_BIT		
     if (bit_istrue(pin,(1<<CONTROL_CYCLE_START_BIT))) { control_state |= CONTROL_PIN_INDEX_CYCLE_START; }
+#endif //#ifdef CONTROL_CYCLE_START_BIT				
   }
   return(control_state);
 }

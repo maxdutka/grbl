@@ -224,8 +224,26 @@ static st_prep_t prep;
 void st_wake_up()
 {
   // Enable stepper drivers.
-  if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
-  else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
+  if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) 
+   {
+#ifdef CPU_MAP_ATMEGA2560_REPRAP14
+		STEPPER_X_DISABLE_PORT |= (1<<STEPPER_X_DISABLE_BIT);
+		STEPPER_Y_DISABLE_PORT |= (1<<STEPPER_Y_DISABLE_BIT);
+		STEPPER_Z_DISABLE_PORT |= (1<<STEPPER_Z_DISABLE_BIT);
+#else	   	   
+	    STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT);
+#endif //#ifdef CPU_MAP_ATMEGA2560_REPRAP14		
+   }
+  else
+   {
+#ifdef CPU_MAP_ATMEGA2560_REPRAP14
+	    STEPPER_X_DISABLE_PORT &= ~(1<<STEPPER_X_DISABLE_BIT);
+	    STEPPER_Y_DISABLE_PORT &= ~(1<<STEPPER_Y_DISABLE_BIT);
+	    STEPPER_Z_DISABLE_PORT &= ~(1<<STEPPER_Z_DISABLE_BIT);
+#else	   
+	    STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); 
+#endif //#ifdef CPU_MAP_ATMEGA2560_REPRAP14			
+   }
 
   // Initialize stepper output bits to ensure first ISR call does not step.
   st.step_outbits = step_port_invert_mask;
@@ -263,8 +281,26 @@ void st_go_idle()
     pin_state = true; // Override. Disable steppers.
   }
   if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { pin_state = !pin_state; } // Apply pin invert.
-  if (pin_state) { STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); }
-  else { STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT); }
+  if (pin_state) 
+  { 
+#ifdef CPU_MAP_ATMEGA2560_REPRAP14
+	  STEPPER_X_DISABLE_PORT |= (1<<STEPPER_X_DISABLE_BIT);
+	  STEPPER_Y_DISABLE_PORT |= (1<<STEPPER_Y_DISABLE_BIT);
+	  STEPPER_Z_DISABLE_PORT |= (1<<STEPPER_Z_DISABLE_BIT);
+#else	  
+	  STEPPERS_DISABLE_PORT |= (1<<STEPPERS_DISABLE_BIT); 
+#endif //#ifdef CPU_MAP_ATMEGA2560_REPRAP14	  
+  }
+  else 
+  {
+#ifdef CPU_MAP_ATMEGA2560_REPRAP14
+	  STEPPER_X_DISABLE_PORT &= ~(1<<STEPPER_X_DISABLE_BIT);
+	  STEPPER_Y_DISABLE_PORT &= ~(1<<STEPPER_Y_DISABLE_BIT);
+	  STEPPER_Z_DISABLE_PORT &= ~(1<<STEPPER_Z_DISABLE_BIT);
+#else
+	  STEPPERS_DISABLE_PORT &= ~(1<<STEPPERS_DISABLE_BIT);
+#endif //#ifdef CPU_MAP_ATMEGA2560_REPRAP14
+  }
 }
 
 
@@ -567,7 +603,13 @@ void stepper_init()
 {
   // Configure step and direction interface pins
   STEP_DDR |= STEP_MASK;
+#ifdef CPU_MAP_ATMEGA2560_REPRAP14  
+  STEPPER_X_DISABLE_DDR |= 1<<STEPPER_X_DISABLE_BIT;
+  STEPPER_Y_DISABLE_DDR |= 1<<STEPPER_Y_DISABLE_BIT;
+  STEPPER_Z_DISABLE_DDR |= 1<<STEPPER_Z_DISABLE_BIT;
+#else
   STEPPERS_DISABLE_DDR |= 1<<STEPPERS_DISABLE_BIT;
+#endif //#ifdef CPU_MAP_ATMEGA2560_REPRAP14  
   DIRECTION_DDR |= DIRECTION_MASK;
   
   #ifdef ENABLE_DUAL_AXIS

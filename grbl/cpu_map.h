@@ -249,6 +249,137 @@
 
 #endif
 
+// ------------------------------------------------------------------------------------------------
+
+
+#ifdef CPU_MAP_ATMEGA2560_REPRAP14
+  // Define serial port pins and interrupt vectors.
+  #define SERIAL_RX     USART0_RX_vect
+  #define SERIAL_UDRE   USART0_UDRE_vect
+
+  // Define step pulse output pins. NOTE: All step bit pins must be on the same port.
+  #define STEP_DDR        DDRF
+  #define STEP_PORT       PORTF
+  #define X_STEP_BIT      0
+  #define Y_STEP_BIT      6
+  #define Z_STEP_BIT      4
+  #define STEP_MASK       ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)) // All step bits
+
+  // Define step direction output pins. NOTE: All direction pins must be on the same port.
+  #define DIRECTION_DDR     DDRF
+  #define DIRECTION_PORT    PORTF
+  #define X_DIRECTION_BIT   1
+  #define Y_DIRECTION_BIT   7 
+  #define Z_DIRECTION_BIT   3
+  #define DIRECTION_MASK    ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
+
+  // Define stepper driver enable/disable output pin.
+  #define STEPPER_X_DISABLE_DDR    DDRD
+  #define STEPPER_X_DISABLE_PORT   PORTD
+  #define STEPPER_X_DISABLE_BIT    7
+  
+  #define STEPPER_Y_DISABLE_DDR    DDRF
+  #define STEPPER_Y_DISABLE_PORT   PORTF
+  #define STEPPER_Y_DISABLE_BIT    2
+  
+  #define STEPPER_Z_DISABLE_DDR    DDRK
+  #define STEPPER_Z_DISABLE_PORT   PORTK
+  #define STEPPER_Z_DISABLE_BIT    0  
+  
+
+  // Define homing/hard limit switch input pins and limit interrupt vectors.
+  // NOTE: All limit bit pins must be on the same port, but not on a port with other input pins (CONTROL).
+  #define LIMIT_DDR        DDRE
+  #define LIMIT_PIN        PINE
+  #define LIMIT_PORT       PORTE
+  #define X_LIMIT_BIT      5 
+  #define Y_LIMIT_BIT      4 
+  #define Z_LIMIT_BIT	   3 
+  
+  #define LIMIT_MASK     ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)|(1<<Z_LIMIT_BIT)) // All limit bits
+  #define LIMIT_INT        PCIE0  // Pin change interrupt enable pin
+  #define LIMIT_INT_vect   PCINT0_vect
+  #define LIMIT_PCMSK      PCMSK0 // Pin change interrupt register
+
+  // Define user-control controls (cycle start, reset, feed hold) input pins.
+  // NOTE: All CONTROLs pins must be on the same port and not on a port with other input pins (limits).
+  #define CONTROL_DDR       DDRG
+  #define CONTROL_PIN       PING
+  #define CONTROL_PORT      PORTG
+  //#define CONTROL_RESET_BIT         0  
+  #define CONTROL_FEED_HOLD_BIT     0  
+  //#define CONTROL_CYCLE_START_BIT   2  
+  //#define CONTROL_SAFETY_DOOR_BIT   1  // NOTE: Safety door is shared with feed hold. Enabled by config define.
+  #define CONTROL_INT       PCIE1  // Pin change interrupt enable pin
+  #define CONTROL_INT_vect  PCINT1_vect
+  #define CONTROL_PCMSK     PCMSK1 // Pin change interrupt register
+  #define CONTROL_MASK      (1<<CONTROL_FEED_HOLD_BIT)
+  #define CONTROL_INVERT_MASK   CONTROL_MASK // May be re-defined to only invert certain control pins.
+
+  // Define probe switch input pin.
+  #define PROBE_DDR       DDRK
+  #define PROBE_PIN       PINK
+  #define PROBE_PORT      PORTK
+  #define PROBE_BIT       3 
+  #define PROBE_MASK      (1<<PROBE_BIT)
+
+  #if !defined(ENABLE_DUAL_AXIS)
+
+  // Define flood and mist coolant enable output pins.
+  //#define COOLANT_FLOOD_DDR   DDRC
+  //#define COOLANT_FLOOD_PORT  PORTC
+  //#define COOLANT_FLOOD_BIT   3
+  //#define COOLANT_MIST_DDR   DDRC
+  //#define COOLANT_MIST_PORT  PORTC
+  //#define COOLANT_MIST_BIT   4
+
+  // Define spindle enable and spindle direction output pins.
+  #define SPINDLE_ENABLE_DDR    DDRB
+  #define SPINDLE_ENABLE_PORT   PORTB
+  #define SPINDLE_ENABLE_BIT    4 
+
+  //#define SPINDLE_DIRECTION_DDR   DDRB
+  //#define SPINDLE_DIRECTION_PORT  PORTB
+  //#define SPINDLE_DIRECTION_BIT   4
+
+  // Variable spindle configuration below. Do not change unless you know what you are doing.
+  // NOTE: Only used when variable spindle is enabled.
+  #define SPINDLE_PWM_MAX_VALUE     255 // Don't change. 328p fast PWM mode fixes top value as 255.
+  
+  #ifndef SPINDLE_PWM_MIN_VALUE
+  #define SPINDLE_PWM_MIN_VALUE   1   // Must be greater than zero.
+  #endif
+  
+  #define SPINDLE_PWM_OFF_VALUE     0
+  #define SPINDLE_PWM_RANGE         (SPINDLE_PWM_MAX_VALUE-SPINDLE_PWM_MIN_VALUE)
+  #define SPINDLE_TCCRA_REGISTER    TCCR2A
+  #define SPINDLE_TCCRB_REGISTER    TCCR2B
+  #define SPINDLE_OCR_REGISTER      OCR2A
+  #define SPINDLE_COMB_BIT          COM2A1
+
+  // Prescaled, 8-bit Fast PWM mode.
+  #define SPINDLE_TCCRA_INIT_MASK   ((1<<WGM20) | (1<<WGM21))  // Configures fast PWM mode.
+  // #define SPINDLE_TCCRB_INIT_MASK   (1<<CS20)               // Disable prescaler -> 62.5kHz
+  // #define SPINDLE_TCCRB_INIT_MASK   (1<<CS21)               // 1/8 prescaler -> 7.8kHz (Used in v0.9)
+  // #define SPINDLE_TCCRB_INIT_MASK   ((1<<CS21) | (1<<CS20)) // 1/32 prescaler -> 1.96kHz
+  #define SPINDLE_TCCRB_INIT_MASK      (1<<CS22)               // 1/64 prescaler -> 0.98kHz (J-tech laser)
+
+  // NOTE: On the 328p, these must be the same as the SPINDLE_ENABLE settings.
+  #define SPINDLE_PWM_DDR   DDRB
+  #define SPINDLE_PWM_PORT  PORTB
+  #define SPINDLE_PWM_BIT   4
+   
+  
+  #else
+	// Dual axis future not supported
+  #endif
+
+#endif //CPU_MAP_ATMEGA2560_REPRAP14
+
+
+
+
+
 /*
 #ifdef CPU_MAP_CUSTOM_PROC
   // For a custom pin map or different processor, copy and edit one of the available cpu

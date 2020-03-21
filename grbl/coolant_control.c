@@ -23,8 +23,11 @@
 
 void coolant_init()
 {
+#ifdef COOLANT_FLOOD_DDR		
   COOLANT_FLOOD_DDR |= (1 << COOLANT_FLOOD_BIT); // Configure as output pin
-  #ifdef ENABLE_M7
+#endif //#ifdef COOLANT_FLOOD_DDR  
+  
+  #if defined ENABLE_M7 && defined COOLANT_MIST_DDR
     COOLANT_MIST_DDR |= (1 << COOLANT_MIST_BIT);
   #endif
   coolant_stop();
@@ -35,6 +38,8 @@ void coolant_init()
 uint8_t coolant_get_state()
 {
   uint8_t cl_state = COOLANT_STATE_DISABLE;
+  
+#ifdef COOLANT_FLOOD_PORT  
   #ifdef INVERT_COOLANT_FLOOD_PIN
     if (bit_isfalse(COOLANT_FLOOD_PORT,(1 << COOLANT_FLOOD_BIT))) {
   #else
@@ -42,7 +47,11 @@ uint8_t coolant_get_state()
   #endif
     cl_state |= COOLANT_STATE_FLOOD;
   }
-  #ifdef ENABLE_M7
+#endif //COOLANT_FLOOD_PORT  
+  
+  
+  
+  #if defined ENABLE_M7 && defined COOLANT_MIST_PORT
     #ifdef INVERT_COOLANT_MIST_PIN
       if (bit_isfalse(COOLANT_MIST_PORT,(1 << COOLANT_MIST_BIT))) {
     #else
@@ -59,12 +68,16 @@ uint8_t coolant_get_state()
 // an interrupt-level. No report flag set, but only called by routines that don't need it.
 void coolant_stop()
 {
+#ifdef COOLANT_FLOOD_PORT	
   #ifdef INVERT_COOLANT_FLOOD_PIN
     COOLANT_FLOOD_PORT |= (1 << COOLANT_FLOOD_BIT);
   #else
     COOLANT_FLOOD_PORT &= ~(1 << COOLANT_FLOOD_BIT);
   #endif
-  #ifdef ENABLE_M7
+#endif //COOLANT_FLOOD_PORT  
+  
+  
+  #if defined ENABLE_M7 && defined COOLANT_MIST_PORT
     #ifdef INVERT_COOLANT_MIST_PIN
       COOLANT_MIST_PORT |= (1 << COOLANT_MIST_BIT);
     #else
@@ -82,6 +95,8 @@ void coolant_set_state(uint8_t mode)
 {
   if (sys.abort) { return; } // Block during abort.  
   
+  #ifdef COOLANT_FLOOD_PORT  
+  
 	if (mode & COOLANT_FLOOD_ENABLE) {
 		#ifdef INVERT_COOLANT_FLOOD_PIN
 			COOLANT_FLOOD_PORT &= ~(1 << COOLANT_FLOOD_BIT);
@@ -95,8 +110,10 @@ void coolant_set_state(uint8_t mode)
 			COOLANT_FLOOD_PORT &= ~(1 << COOLANT_FLOOD_BIT);
 		#endif
 	}
+	
+  #endif //COOLANT_FLOOD_PORT	
   
-	#ifdef ENABLE_M7
+	#if defined ENABLE_M7 && defined COOLANT_MIST_PORT
 		if (mode & COOLANT_MIST_ENABLE) {
 			#ifdef INVERT_COOLANT_MIST_PIN
 				COOLANT_MIST_PORT &= ~(1 << COOLANT_MIST_BIT);
