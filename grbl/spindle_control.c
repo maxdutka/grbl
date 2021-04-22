@@ -53,7 +53,15 @@ void spindle_init()
     #endif //#ifdef SPINDLE_DIRECTION_BIT	  
     #endif
   #endif
-
+  
+  
+  #ifdef SPINDLE_24V_48V_ON_PORT
+    SPINDLE_24V_48V_ON_PORT &= ~(1<<SPINDLE_24V_48V_ON_PWM_BIT);
+    SPINDLE_24V_48V_ON_DDR |= (1<<SPINDLE_24V_48V_ON_PWM_BIT);	
+	SPINDLE_24V_48V_ON_PORT |= (1<<SPINDLE_24V_48V_ON_PWM_BIT); // set 48V on
+  #endif //SPINDLE_24V_48V_ON_PORT
+  
+  
   spindle_stop();
 }
 

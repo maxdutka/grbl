@@ -280,6 +280,11 @@ void st_go_idle()
     delay_ms(settings.stepper_idle_lock_time);
     pin_state = true; // Override. Disable steppers.
   }
+  
+  
+  if((STEPPER_KEEP_ON_PIN) & (1<<STEPPER_KEEP_ON_BIT)) // keep stepper on
+	return;
+  
   if (bit_istrue(settings.flags,BITFLAG_INVERT_ST_ENABLE)) { pin_state = !pin_state; } // Apply pin invert.
   if (pin_state) 
   { 
@@ -633,6 +638,18 @@ void stepper_init()
   #ifdef STEP_PULSE_DELAY
     TIMSK0 |= (1<<OCIE0A); // Enable Timer0 Compare Match A interrupt
   #endif
+  
+  // stepper keep on switch
+  STEPPER_KEEP_ON_DDR &= ~(1<<STEPPER_KEEP_ON_BIT);
+  STEPPER_KEEP_ON_PORT |= (1<<STEPPER_KEEP_ON_BIT);         
+  
+  
+  if((STEPPER_KEEP_ON_PIN) & (1<<STEPPER_KEEP_ON_BIT)) // keep stepper on
+  {
+	  
+  }
+  
+  
 }
 
 

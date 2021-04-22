@@ -368,6 +368,15 @@
   #define SPINDLE_PWM_DDR   DDRB
   #define SPINDLE_PWM_PORT  PORTB
   #define SPINDLE_PWM_BIT   4
+
+  #define SPINDLE_24V_48V_ON_DDR   DDRL
+  #define SPINDLE_24V_48V_ON_PORT  PORTL
+  #define SPINDLE_24V_48V_ON_PWM_BIT   7
+  
+  #define STEPPER_KEEP_ON_DDR DDRF
+  #define STEPPER_KEEP_ON_PIN PINF
+  #define STEPPER_KEEP_ON_BIT 5
+  #define STEPPER_KEEP_ON_PORT PORTF
    
   
   #else

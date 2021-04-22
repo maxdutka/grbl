@@ -572,7 +572,7 @@
 
 #ifdef DEFAULTS_MODED_MD_REPRAP14
 // Grbl generic default settings. Should work across different machines.
-#define DEFAULT_X_STEPS_PER_MM 160.0
+#define DEFAULT_X_STEPS_PER_MM 160.5
 #define DEFAULT_Y_STEPS_PER_MM 402.0
 #define DEFAULT_Z_STEPS_PER_MM 1591.0
 #define DEFAULT_X_MAX_RATE 2000.0 // mm/min
@@ -600,7 +600,7 @@
 #define DEFAULT_HARD_LIMIT_ENABLE 0  // false
 #define DEFAULT_INVERT_PROBE_PIN 0 // false
 #define DEFAULT_LASER_MODE 0 // false
-#define DEFAULT_HOMING_ENABLE 1  // false
+#define DEFAULT_HOMING_ENABLE 0  // false
 #define DEFAULT_HOMING_DIR_MASK (1<<Z_AXIS) // move positive dir
 #define DEFAULT_HOMING_FEED_RATE 25.0 // mm/min
 #define DEFAULT_HOMING_SEEK_RATE 500.0 // mm/min
